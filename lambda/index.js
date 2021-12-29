@@ -1,10 +1,3 @@
-/* *
- * This sample demonstrates handling intents for an Alexa skill implementing the AudioPlayer interface using the Alexa Skills Kit SDK (v2).
- * This sample works using the default DynamoDB table associated with an Alexa-hosted skill - you will need to use this with a hosted skill,
- * or you use your own DynamoDB table in the request and response interceptors.
- * Please visit https://github.com/alexa-samples for additional examples on implementing slots, dialog management,
- * session persistence, api calls, and more.
- * */
 const Alexa = require('ask-sdk-core');
 const AWS = require('aws-sdk');
 const ddbAdapter = require('ask-sdk-dynamodb-persistence-adapter');
@@ -23,10 +16,7 @@ const LaunchRequestHandler = {
             .getResponse();
     }
 };
-/**
- * Intent handler to start playing an audio file.
- * By default, it will play a specific audio stream.
- * */
+
 const PlayAudioIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
@@ -39,17 +29,7 @@ const PlayAudioIntentHandler = {
         const speakOutput = 'Playing the audio stream.';
         const playBehavior = 'REPLACE_ALL';
         const podcastUrl = 'https://radiosahaja.com:8443/SYradio.mp3';
-        
-        /**
-         * If your audio file is located on the S3 bucket in a hosted skill, you can use the line below to retrieve a presigned URL for the audio file.
-         * https://developer.amazon.com/docs/alexa/hosted-skills/alexa-hosted-skills-media-files.html
-         * 
-         * const podcastUrl = Util.getS3PreSignedUrl("Media/audio.mp3").replace(/&/g,'&amp;');
-         * 
-         * If you cannot play your own audio in place of the sample URL, make sure your audio file adheres to the guidelines:
-         * https://developer.amazon.com/docs/alexa/custom-skills/audioplayer-interface-reference.html#audio-stream-requirements
-        */
-
+       
         return handlerInput.responseBuilder
             .speak(speakOutput)
             .addAudioPlayerPlayDirective(
@@ -62,10 +42,6 @@ const PlayAudioIntentHandler = {
     }
 };
 
-/**
- * Intent handler to start playing an audio file.
- * By default, it will play a specific audio stream.
- * */
 const PauseAudioIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
@@ -77,11 +53,7 @@ const PauseAudioIntentHandler = {
             .getResponse();
     }
 };
-/**
- * Intent handler for built-in intents that aren't supported in this sample skill.
- * As this is a sample skill for a single stream, these intents are irrelevant to this skill.
- * Regardless, the skill needs to handle this gracefully, which is why this handler exists.
- * */
+
 const UnsupportedAudioIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
@@ -134,12 +106,7 @@ const CancelAndStopIntentHandler = {
             .getResponse();
     }
 };
-/* *
- * AudioPlayer events can be triggered when users interact with your audio playback, such as stopping and 
- * starting the audio, as well as when playback is about to finish playing or playback fails.
- * This handler will save the appropriate details for each event and log the details of the exception,
- * which can help troubleshoot issues with audio playback.
- * */
+
 const AudioPlayerEventHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type.startsWith('AudioPlayer.');
@@ -182,13 +149,6 @@ const AudioPlayerEventHandler = {
   },
 };
 
-
-/* *
- * PlaybackController events can be triggered when users interact with the audio controls on a device screen.
- * starting the audio, as well as when playback is about to finish playing or playback fails.
- * This handler will save the appropriate details for each event and log the details of the exception,
- * which can help troubleshoot issues with audio playback.
- * */
 const PlaybackControllerHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type.startsWith('PlaybackController.');
@@ -224,10 +184,7 @@ const PlaybackControllerHandler = {
     return response;
   },
 };
-/* *
- * SystemExceptions can be triggered if there is a problem with the audio that is trying to be played.
- * This handler will log the details of the exception and can help troubleshoot issues with audio playback.
- * */
+
 const SystemExceptionHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'System.ExceptionEncountered';
@@ -237,11 +194,6 @@ const SystemExceptionHandler = {
   },
 };
 
-/* *
- * FallbackIntent triggers when a customer says something that doesn’t map to any intents in your skill
- * It must also be defined in the language model (if the locale supports it)
- * This handler can be safely added but will be ingnored in locales that do not support it yet 
- * */
 const FallbackIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
@@ -256,26 +208,18 @@ const FallbackIntentHandler = {
             .getResponse();
     }
 };
-/* *
- * SessionEndedRequest notifies that a session was ended. This handler will be triggered when a currently open 
- * session is closed for one of the following reasons: 1) The user says "exit" or "quit". 2) The user does not 
- * respond or says something that does not match an intent defined in your voice model. 3) An error occurs 
- * */
+
 const SessionEndedRequestHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'SessionEndedRequest';
     },
     handle(handlerInput) {
         console.log(`~~~~ Session ended: ${JSON.stringify(handlerInput.requestEnvelope)}`);
-        // Any cleanup logic goes here.
-        return handlerInput.responseBuilder.getResponse(); // notice we send an empty response
+        
+        return handlerInput.responseBuilder.getResponse();
     }
 };
-/* *
- * The intent reflector is used for interaction model testing and debugging.
- * It will simply repeat the intent the user said. You can create custom handlers for your intents 
- * by defining them above, then also adding them to the request handler chain below 
- * */
+
 const IntentReflectorHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest';
@@ -286,15 +230,10 @@ const IntentReflectorHandler = {
 
         return handlerInput.responseBuilder
             .speak(speakOutput)
-            //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
             .getResponse();
     }
 };
-/**
- * Generic error handling to capture any syntax or routing errors. If you receive an error
- * stating the request handler chain is not found, you have not implemented a handler for
- * the intent being invoked or included it in the skill builder below 
- * */
+
 const ErrorHandler = {
     canHandle() {
         return true;
@@ -323,22 +262,10 @@ async function setPlaybackInfo(handlerInput, playbackInfoObject) {
       });
 }
 
-// Request and response interceptors using the DynamoDB table associated with Alexa-hosted skills
-
 const LoadPersistentAttributesRequestInterceptor = {
   async process(handlerInput) {
     const persistentAttributes = await handlerInput.attributesManager.getPersistentAttributes();
 
-    /**
-     * Check if user is invoking the skill the first time and initialize preset values
-        playbackInfo: {
-              offsetInMilliseconds - this is used to set the offset of the audio file 
-                        to save the position between sessions
-              token - save an audio token for this play session
-              inPlaybackSession - used to record the playback state of the session
-              hasPreviousPlaybackSession - used to help confirm previous playback state
-            }
-    */
     if (Object.keys(persistentAttributes).length === 0) {
       handlerInput.attributesManager.setPersistentAttributes({
         playbackInfo: {
@@ -358,11 +285,6 @@ const SavePersistentAttributesResponseInterceptor = {
   },
 };
 
-/**
- * This handler acts as the entry point for your skill, routing all request and response
- * payloads to the handlers above. Make sure any new handlers or interceptors you've
- * defined are included below. The order matters - they're processed top to bottom 
- * */
 exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         LaunchRequestHandler,
